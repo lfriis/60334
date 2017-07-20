@@ -20,28 +20,34 @@ if (isset($POST_['fname']) &&
   $email        = get_post($conn, 'email');
   $password     = get_post($conn, 'password');
 
-//PREPARE ("INSERT INTO user_codes VALUES (?,?,?,?,?,?)";
-    $query = "INSERT INTO user_codes VALUES
-      ('$fname', '$lname', '$user_code', '$created_date', '$email', '$password')";
-    $result = $conn->query($query);
+    $query = "INSERT INTO user_codes VALUES (?,?,?,?,?,?)";
+    $stmt =  mysqli_prepare($conn, $query);
+    mysqli_execute($stmt);
+    mysqli_stmt_close($stmt);
 
-    if (!$result) echo "INSERT failed: $query </br>" . $conn->error . "</br></br>";
+    if (!$stmt) echo "INSERT failed: $query </br>" . $conn->error . "</br></br>";
     else echo "Insert Successful";
   }
 
 echo <<<_END
 
-<form action="sectiona.php" method="post">
+<form action="sectiona.php" method="post"><pre>
   First Name: <input type="text" name="fname" required/></br>
   Last Name:  <input type="text" name="lname" required/></br>
   User Type: <select></br>
-              <option value="1" required/>User</option>
-              <option value="2" required/>Admin</option>
+              <option value="user" required/>User</option>
+              <option value="admin" required/>Admin</option>
              </select></br>
   E-mail: <input type="email" name="email" required/></br>
   Password: <input type="password" name="password" required/></br>
   <input type="submit" value="Submit">
-</form>
+</pre></form>
 _END;
 
+$conn->close();
+
+function get_post($conn, $var)
+{
+  return $conn->real_escape_string($_POST[$var]);
+}
 ?>
